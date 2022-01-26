@@ -1,0 +1,69 @@
+게시판
+
+사용 흐름
+
+- 글쓰기 / 글정보 조회(전체) / 글 하나 선택
+ / 글하나의 정보만 화면에 출력 / 글 수정, 삭제, 답글쓰기
+ 
+ 
+ p443 ~
+     커넥션 풀 : 사용자의 요청에 따른 커넥션(연결정보)를 생성후 풀에 저장해서 지속적으로 사용
+  
+  JDNI( Java Naming and Directory Interface) : 명명 서비스 및 디렉토리 서비스에 접근하기위한 API
+  
+  - Connection
+  
+  - DBCP
+  
+  - pool
+  
+  * 커넥션 풀 사용 전략
+  
+  	 사용 <->	[con][][][][][]
+  	 
+  	 1) service() 메서드 (사용자 요청)당 1개씩 pool할당
+  	 2) 커넥션의 개수를 제한
+  	 3) 커넥션 객체를 사용자가 다쓴 경우 자원 회수
+  	 
+  	 		<커넥션 풀>
+  	 		[con][][][][][]
+  	 
+  	 1) 웹 브라우저 DB요청 (request) -> 2) 할당된 커넥션 객체가 있는지 없는지 체크
+  	 
+  	 -> 3-1) 할당 가능한 커넥션 객체가 있을 때
+  	 -> 4) 커넥션 객체를 할당
+  	 -> 5) 커넥션 객체를 사용 (디비연결, SQL 작성, pstmt 객체, 실행)
+  	 -> 6) 커넥션 객체를 반환
+  	 
+  	 
+  	 1) 웹 브라우저 DB요청 (request) -> 2) 할당된 커넥션 객체가 있는지 없는지 체크
+  	 
+  	 -> 3-2) 할당 가능한 커넥션 객체가 없을 때
+  	 -> 3-2-1) 커넥션 객체를 반환할 때까지 대기하거나, 임시객체를 생성
+  	 -> 4) 커넥션 객체를 할당
+  	 -> 5) 커넥션 객체를 사용 (디비연결, SQL 작성, pstmt 객체, 실행)
+  	 -> 6) 커넥션 객체를 반환
+  	 
+  	
+  	[WebContent/META_INF/context.xml 파일]
+  	
+  	=> DB연결에 필요한 정보를 저장해놓은 파일
+  	C:\Program Files\Apache Software Foundation\Tomcat 8.5\webapps\docs\jndi-resources-howto.html
+  	 
+  	<Context>
+	<Resource name="jdbc/mysqldb" // "java:comp/env" 컨텍스트와 연결된 이름정보
+			  auth="Container" // 컨테이너(웹컨테이너-톰캣)를 자원관리자로 설정 (Application or Container)
+			  type="javax.sql.DataSource" // 리소스를 사용할 때 (실제로 사용할 때) 사용되는 타입
+			  driverClassName="com.mysql.cj.jdbc.Driver" // 드라이버 주소
+			  url="jdbc:mysql://localhost:3306/jspdb" // 디비주소
+			  username="root" // 디비 아이디
+			  password="1234" // 디비 비밀번호
+			  maxWait="5000" // 커넥션풀이 없을 경우 대기시간	5초(커넥션 회수를 기다리는 시간)			
+	/>
+
+	</Context>
+  	 
+  	 
+  	 
+  	 
+  	 
