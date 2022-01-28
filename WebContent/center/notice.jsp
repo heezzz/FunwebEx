@@ -1,3 +1,4 @@
+
 <%@page import="com.itwillbs.board.BoardDTO"%>
 <%@page import="java.util.List"%>
 <%@page import="com.itwillbs.board.BoardDAO"%>
@@ -28,7 +29,7 @@
 <body>
 <div id="wrap">
 <!-- 헤더들어가는 곳 -->
-	<jsp:include page="../inc/top.jsp"/>
+  <jsp:include page="../inc/top.jsp" />
 <!-- 헤더들어가는 곳 -->
 
 <!-- 본문들어가는 곳 -->
@@ -41,75 +42,82 @@
 <ul>
 <li><a href="boardWrite.jsp">글쓰기(new)</a></li>
 <li><a href="notice.jsp">게시판 목록(List)</a></li>
-<li><a href="#">Driver Download</a></li>
+<li><a href="fBoardWrite.jsp">자료실 (파일업로드/다운로드)</a></li>
 <li><a href="#">Service Policy</a></li>
 </ul>
 </nav>
 <!-- 왼쪽메뉴 -->
+
 <%
-	// BoardDAO 객체 생성
-	BoardDAO bdao = new BoardDAO();
-	// 게시판 DB에 있는 글 개수를 확인
-	int cnt = bdao.getBoardCount();
-	
-	//////////////////////////////////////////////////////////////////////////////////////////
-	// 페이징 처리
-	
-	// 한 페이지에 출력될 글 수 
-	int pageSize = 3;
-	
-	// 현 페이지 정보 설정
-	String pageNum = request.getParameter("pageNum");
-	if(pageNum == null){
-		pageNum = "1";
-	}
-	
-	// 첫행번호를 계산
-	int currentPage = Integer.parseInt(pageNum);	
-	int startRow = (currentPage-1)*pageSize + 1;
-	
-
-
-
+  // BoardDAO 객체 생성
+  BoardDAO bdao = new BoardDAO();
+  // 게시판 DB에 있는 글 개수를 확인
+  int cnt = bdao.getBoardCount(); 
+  
+  
+  ///////////////////////////////////////////////////////////////////////////////
+  // 페이징 처리
+  
+  // 한 페이지에 출력될 글 개수
+  int pageSize = 10;
+  
+  // 현 페이지 정보 설정
+  String pageNum = request.getParameter("pageNum");
+  if(pageNum == null){
+	  pageNum = "1";
+  }
+  
+  
+  // 첫행번호를 계산
+  int currentPage = Integer.parseInt(pageNum);
+  int startRow = (currentPage-1)*pageSize+1;
+  
+  ///////////////////////////////////////////////////////////////////////////////
 %>
+
+
 <!-- 게시판 -->
 <article>
-<h1>게시판 목록 [글 갯수 : <%=cnt %>]</h1>
+<h1>게시판 목록 [글 개수 : <%=cnt %>]</h1>
 <table id="notice">
 <tr><th class="tno">No.</th>
     <th class="ttitle">Title</th>
     <th class="twrite">Writer</th>
     <th class="tdate">Date</th>
     <th class="tread">Read</th></tr>
-
-<% if(cnt !=0){ 
-	// DB에 있는 게시판의 글정보 모두를 가져오기
-	
-	//List boardList = bdao.getBoardList();
-	List boardList = bdao.getBoardList(startRow,pageSize);
-	for(int i=0;i<boardList.size();i++){
-		BoardDTO bdto = (BoardDTO)boardList.get(i);
-%>	
+    
+<% if(cnt != 0){ 
+    // DB에 있는 게시판의 글정보 모두를 가져오기
+    
+    //List boardList = bdao.getBoardList();
+    List boardList = bdao.getBoardList(startRow,pageSize);
+    for(int i=0;i<boardList.size();i++){
+    	 BoardDTO bdto = (BoardDTO) boardList.get(i);    	
+%>    
 <tr>
-	<td><%=bdto.getNum()%></td>
+	<td><%=bdto.getNum() %></td>
 	<td class="left">
-		<a href="contents.jsp?num=<%=bdto.getNum()%>&pageNum=<%=pageNum%>"><%=bdto.getSubject()%></a>
+	 <%if(bdto.getRe_lev()>0){ //답글일때  %>
+	    <img src="level.gif" height="10" width="<%=bdto.getRe_lev()*10%>">
+	    <img src="re.gif">
+	 <%} %>  
+		<a href="contents.jsp?num=<%=bdto.getNum()%>&pageNum=<%=pageNum%>"><%=bdto.getSubject() %></a>
 	</td>
     <td><%=bdto.getName() %></td>
-    <td><%=bdto.getDate()%></td>
+    <td><%=bdto.getDate() %></td>
     <td><%=bdto.getReadcount() %></td>
-</tr>
-<%
-	}//for
-	}else{%>
+    </tr>
+<% 
+    }// for
+  }else{%>
 <tr>
-	<td colspan ="5">
-	게시판에 글이 없습니다.<br>
-	새 글을 작성하세요 ~ ! <br>
-	<a href="boardWrite.jsp"> 글 쓰기 페이지로 </a>
-	</td>
+  <td colspan="5">
+      게시판에 글이 없습니다.<br>
+      새 글을 작성하세요~!<br>
+      <a href="boardWrite.jsp"> 글 쓰기페이지로 </a>
+  </td> 
 </tr>
-<%} %>    
+<%} %>
 </table>
 <div id="table_search">
 <input type="text" name="search" class="input_box">
@@ -117,42 +125,45 @@
 </div>
 <div class="clear"></div>
 	<div id="page_control">
-	<%if(cnt != 0){ 
-		////////////////////////////////////////////////////////////////
-		// 페이징 처리
-		// 전체 페이지수 계산
-		int pageCount = cnt / pageSize + (cnt%pageSize==0?0:1);
+	  <% if(cnt != 0){ 
+	     ////////////////////////////////////////////////////////////
+	     // 페이징 처리
+	     // 전체 페이지수 계산
+	     int pageCount = cnt / pageSize + (cnt%pageSize==0? 0:1);
+	     
+	     // 한 페이지에 보여줄 페이지블럭
+	     int pageBlock = 2;
+	     
+	     // 한 페이지에 보여줄 페이지 블럭 시작번호 계산
+	     int startPage = ((currentPage-1)/pageBlock)*pageBlock+1;
+	     
+	     // 한 페이지에 보여줄 페이지 블럭 끝번호 계산
+	     int endPage = startPage + pageBlock-1;
+	     if(endPage > pageCount){
+	    	 endPage = pageCount;
+	     }
+	  
+	  %>
+	    <% if(startPage>pageBlock){ %>
+			<a href="notice.jsp?pageNum=<%=startPage-pageBlock%>">Prev</a>
+		<% } %>
 		
-		// 한 페이지에 보여줄 페이지 블럭
-		int pageBlock = 10;
+		<% for(int i=startPage;i<=endPage;i++){ %>
+			<a href="notice.jsp?pageNum=<%=i%>"><%=i %></a>
+		<% }%>
 		
-		// 한 페이지에 보여줄 페이지 블럭 시작번호 계산
-		int startPage = ((currentPage-1)/pageBlock)*pageBlock+1;
+		<% if(endPage < pageCount){%>
+			<a href="notice.jsp?pageNum=<%=startPage+pageBlock%>">Next</a>
+		<% }%>
 		
-		// 한 페이지에 보여줄 페이지 블럭 끝 번호 계산
-		int endPage = startPage + pageBlock-1;
-		if(endPage > pageCount){
-			endPage = pageCount;
-		}	
-	
-	%>
-	<% if(startPage>pageBlock){ %>
-		<a href="notice.jsp?pageNum=<%=startPage-pageBlock%>">Prev</a>
-	<%} %>
-	<% for(int i=startPage;i<=endPage;i++){ %>
-		<a href="notice.jsp?pageNum=<%=i%>"><%=i %></a>
-	<%} %>
-	<% if(endPage<pageCount){ %>
-		<a href="notice.jsp?pageNum=<%=startPage+pageBlock%>">Next</a>
-	<%} %>
-	<%} %>
+	  <% } %>
 	</div>
 </article>
 <!-- 게시판 -->
 <!-- 본문들어가는 곳 -->
 <div class="clear"></div>
 <!-- 푸터들어가는 곳 -->
-	<jsp:include page="../inc/bottom.jsp"/>
+ <jsp:include page="../inc/bottom.jsp" />
 <!-- 푸터들어가는 곳 -->
 </div>
 </body>
