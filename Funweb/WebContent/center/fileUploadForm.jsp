@@ -10,7 +10,7 @@
 <h1>WebContent/center/fileUploadForm.jsp</h1>
 
  <fieldset>
- 	<legend> 파일 업로드 </legend>
+ 	<legend>파일 업로드 </legend>
  	
  	<form action="fileUploadPro.jsp" method="post" enctype="multipart/form-data">
  		
